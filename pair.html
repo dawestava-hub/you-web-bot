@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quick Pairing</title>
+<title>YOU WEB BOT PAIRING</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
 
 <style>
 *{
@@ -19,16 +21,35 @@ body{
   justify-content:center;
   align-items:center;
   height:100vh;
+  overflow:hidden;
   color:white;
+  position:relative;
 }
 
+/* ===== BACKGROUND ===== */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left, rgba(0,255,166,0.12), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0,207,255,0.12), transparent 35%),
+    #050b14;
+  z-index:-1;
+}
+
+/* ===== CONTAINER ===== */
 .container{
   width:420px;
   background:#0a1220;
   border-radius:25px;
   padding:20px;
+  border:1px solid rgba(255,255,255,0.05);
+  box-shadow:0 0 40px rgba(0,0,0,0.5);
+  backdrop-filter:blur(10px);
 }
 
+/* ===== HEADER ===== */
 .header{
   display:flex;
   justify-content:space-between;
@@ -36,180 +57,292 @@ body{
   margin-bottom:20px;
 }
 
+/* ===== TITLE ===== */
 .header h1{
   font-size:20px;
-  font-weight:600;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#7a5cff,#00ffa6);
+  background-size:300%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
 }
 
+@keyframes shine{
+  0%{background-position:0%}
+  100%{background-position:300%}
+}
+
+/* ===== LOGO ===== */
 .logo{
-  width:100px;
-  height:100px;
+  width:95px;
+  height:95px;
   object-fit:contain;
+  border-radius:20px;
 }
 
+/* ===== SUBTITLE ===== */
+.subtitle{
+  color:#8fa3c1;
+  font-size:13px;
+  margin-bottom:15px;
+}
+
+/* ===== LABEL ===== */
 .label{
   font-size:12px;
   color:#8fa3c1;
-  margin-bottom:5px;
+  margin-bottom:8px;
 }
 
-.input{
-  width:100%;
+/* ===== INPUT ===== */
+.input-container{
+  display:flex;
+  margin-bottom:15px;
+}
+
+.input-container input{
+  width:70%;
   background:#050b14;
   border:1px solid #1c2a40;
   padding:15px;
-  border-radius:15px;
-  margin-bottom:15px;
+  border-radius:15px 0 0 15px;
   font-size:16px;
   color:white;
   outline:none;
 }
 
-.btn{
-  width:100%;
-  padding:15px;
+.input-container input::placeholder{
+  color:#6f7d94;
+}
+
+/* ===== BUTTON ===== */
+.input-container button{
+  width:30%;
   border:none;
-  border-radius:30px;
+  border-radius:0 15px 15px 0;
   background:linear-gradient(90deg,#00ffa6,#00cfff);
   color:black;
   font-weight:bold;
-  font-size:16px;
+  font-size:15px;
   cursor:pointer;
-  margin-bottom:20px;
+  transition:0.3s;
 }
 
-.code-box{
+.input-container button:hover{
+  transform:scale(1.02);
+}
+
+/* ===== CODE DISPLAY ===== */
+#pair{
+  margin-top:15px;
+}
+
+.code-display{
   border:1px solid #1c2a40;
   border-radius:20px;
   padding:20px;
   text-align:center;
-}
-
-.code-title{
-  display:flex;
-  justify-content:space-between;
-  color:#00ffa6;
-  font-size:14px;
-  margin-bottom:15px;
-}
-
-.copy-btn{
+  background:#050b14;
+  transition:0.3s;
   cursor:pointer;
+  font-weight:bold;
+  color:#00cfff;
 }
 
-.code{
-  font-size:18px;
-  letter-spacing:2px;
-  color:#8fa3c1;
-  margin-bottom:15px;
+.code-display:hover{
+  border-color:#00cfff;
+  box-shadow:0 0 15px rgba(0,207,255,0.3);
 }
 
-.code.active{
-  font-size:32px;
-  letter-spacing:5px;
+.code-display.copied{
+  border-color:#00ffa6;
   color:#00ffa6;
 }
 
-.steps{
-  font-size:12px;
+/* ===== STATUS ===== */
+.status-message{
+  text-align:center;
+  font-size:14px;
   color:#8fa3c1;
+  padding:15px;
 }
 
+/* ===== FOOTER ===== */
 .footer{
-  margin-top:15px;
+  margin-top:18px;
   font-size:12px;
   color:#6c7a92;
   text-align:center;
+}
+
+/* ===== MUSIC BUTTON ===== */
+.music-btn{
+  position:fixed;
+  right:20px;
+  top:20px;
+  background:rgba(10,18,32,0.9);
+  color:#00cfff;
+  padding:12px 18px;
+  border-radius:30px;
+  font-weight:bold;
+  cursor:pointer;
+  border:1px solid #00cfff;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:0.3s;
+  backdrop-filter:blur(8px);
+}
+
+.music-btn:hover{
+  background:rgba(0,207,255,0.15);
+  box-shadow:0 0 15px rgba(0,207,255,0.4);
 }
 </style>
 </head>
 
 <body>
 
+<!-- MUSIC BUTTON -->
+<div class="music-btn" onclick="toggleMusic()" id="musicBtn">
+  <i class="fas fa-music"></i>
+  <span>Play</span>
+</div>
+
 <div class="container">
 
+  <!-- HEADER -->
   <div class="header">
-    <h1>Quick Pairing</h1>
+    <h1>YOU WEB BOT</h1>
     <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
   </div>
 
-  <div class="label">INSTANCE PHONE NUMBER</div>
-  <input class="input" id="phone" placeholder="509XXXXXXXX">
-
-  <button class="btn" onclick="generateCode()">🔑 Generate code</button>
-
-  <div class="code-box">
-    <div class="code-title">
-      <span>🔒 PAIRING CODE</span>
-      <span class="copy-btn" onclick="copyCode()">📋 Copy</span>
-    </div>
-
-    <div class="code" id="pairCode">wait your code</div>
-
-    <div class="steps">
-      WhatsApp → Linked Devices → Link with phone number → Enter this code
-    </div>
+  <div class="subtitle">
+    OWNER X TEAM YOU WEB BOT
   </div>
 
+  <div class="label">NUMÉRO (sans le +)</div>
+
+  <div class="input-container">
+    <input type="number" id="number" placeholder="509XXXXXXXX">
+    <button id="submit">Connect</button>
+  </div>
+
+  <main id="pair"></main>
+
   <div class="footer">
-    Secure pairing over cloud infrastructure.
+    YOU WEB BOT IS ONLINE FOR YOU
   </div>
 
 </div>
 
+<!-- MUSIC -->
+<audio id="bgMusic" loop>
+  <source src="https://files.catbox.moe/l5ea0h.mp3" type="audio/mp3">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+
 <script>
+let pairElement = document.getElementById("pair");
+let submitBtn = document.getElementById("submit");
+let numberInput = document.getElementById("number");
 
-async function generateCode(){
+let music = document.getElementById("bgMusic");
+let musicBtn = document.getElementById("musicBtn");
+let started = false;
 
-  const phone = document.getElementById("phone").value.trim();
-  const el = document.getElementById("pairCode");
-
-  if(!phone){
-    alert("Enter phone number");
-    return;
+// MOBILE SAFE AUTOPLAY
+document.body.addEventListener("click", () => {
+  if (!started) {
+    music.play().then(() => {
+      musicBtn.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+      started = true;
+    }).catch(() => {});
   }
+}, { once: true });
 
-  el.innerText = "Generating...";
-  el.classList.remove("active");
-
-  try{
-
-    const res = await fetch("/pair",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ phone })
-    });
-
-    const data = await res.json();
-
-    if(res.ok && data.code){
-      el.innerText = data.code;
-      el.classList.add("active");
-    }else{
-      el.innerText = "Error";
-      alert(data.error || "Failed");
-    }
-
-  }catch(e){
-    el.innerText = "Server Error";
+function toggleMusic() {
+  if (music.paused) {
+    music.play();
+    musicBtn.innerHTML = '<i class="fas fa-pause"></i><span>Pause</span>';
+  } else {
+    music.pause();
+    musicBtn.innerHTML = '<i class="fas fa-music"></i><span>Play</span>';
   }
 }
 
-function copyCode(){
+async function copyCode() {
+  let codeElement = document.getElementById("codeDisplay");
+  if (!codeElement) return;
 
-  const code = document.getElementById("pairCode").innerText;
+  let code = codeElement.innerText.replace('CODE: ', '');
+  await navigator.clipboard.writeText(code);
 
-  if(code === "wait your code" || code === "Generating..." || code === "Error"){
-    alert("Generate code first!");
+  codeElement.classList.add('copied');
+  codeElement.innerHTML = '<i class="fas fa-check"></i> Code copié';
+
+  setTimeout(() => {
+    codeElement.classList.remove('copied');
+    codeElement.innerHTML = `CODE: <span style="color:#ffffff">${code}</span>`;
+  }, 2000);
+}
+
+submitBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  if (!numberInput.value) {
+    pairElement.innerHTML = `
+      <div class="status-message" style="color:#ff6b6b">
+        Entrez votre numéro
+      </div>
+    `;
     return;
   }
 
-  navigator.clipboard.writeText(code).then(()=>{
-    alert("Copied: " + code);
-  });
+  let cleanNumber = numberInput.value.replace(/[^0-9]/g, "");
 
-}
+  if (cleanNumber.length < 11) {
+    pairElement.innerHTML = `
+      <div class="status-message" style="color:#ff6b6b">
+        Numéro invalide
+      </div>
+    `;
+    return;
+  }
 
+  pairElement.innerHTML = `
+    <div class="status-message">
+      Génération du code...
+    </div>
+  `;
+
+  try {
+    let { data } = await axios(`/code?number=${cleanNumber}`);
+    let code = data.code || "Indisponible";
+
+    pairElement.innerHTML = `
+      <div class="code-display" id="codeDisplay" onclick="copyCode()">
+        CODE: <span style="color:#ffffff">${code}</span>
+      </div>
+    `;
+  } catch (error) {
+    pairElement.innerHTML = `
+      <div class="status-message" style="color:#ff6b6b">
+        Erreur de connexion
+      </div>
+    `;
+  }
+});
+
+// ENTER KEY
+numberInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    submitBtn.click();
+  }
+});
 </script>
 
 </body>
