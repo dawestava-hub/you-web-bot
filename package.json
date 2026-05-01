@@ -1,10 +1,8 @@
-
 {
   "name": "you-web-bot",
   "version": "1.0.0",
   "description": "Base complete anonymisee pour bot WhatsApp Baileys",
   "main": "index.js",
-  "type": "module",
   "private": true,
   "scripts": {
     "start": "node index.js"
