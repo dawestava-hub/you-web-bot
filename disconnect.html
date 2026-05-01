@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="fr">
+<head>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Delete Session</title>
+
+<style>
+:root{
+  --bg:#050b14;
+  --card:#0a1220;
+  --accent:#00ffa6;
+  --muted:#8fa3c1;
+  --danger:#ff4d4d;
+  --success:#00ffa6;
+}
+
+/* BASE */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.wrap{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* 🔥 TEXTE OOLICE */
+.title{
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s linear infinite;
+  text-shadow:0 0 10px rgba(0,255,166,0.3),
+               0 0 20px rgba(0,207,255,0.2);
+}
+
+@keyframes glow{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+
+/* INPUT */
+.input{
+  width:100%;
+  padding:15px;
+  border-radius:15px;
+  border:1px solid #1c2a40;
+  background:#050b14;
+  color:white;
+  margin-bottom:15px;
+  outline:none;
+}
+
+/* BUTTONS */
+.row{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-check{
+  background:#1c2a40;
+  color:white;
+}
+
+.btn-delete{
+  background:linear-gradient(90deg,#ff4d4d,#ff0000);
+  color:white;
+}
+
+.btn-clear{
+  background:#1c2a40;
+  color:white;
+}
+
+/* STATUS */
+.status{
+  border:1px solid #1c2a40;
+  border-radius:15px;
+  padding:15px;
+  text-align:center;
+  font-size:14px;
+}
+
+.success{color:#00ffa6;}
+.error{color:#ff4d4d;}
+
+/* FOOTER */
+.footer{
+  margin-top:10px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+
+/* LOGIN OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-card{
+  width:350px;
+  background:#0a1220;
+  padding:20px;
+  border-radius:20px;
+}
+
+.login-input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #1c2a40;
+  background:#050b14;
+  color:white;
+  margin-top:10px;
+}
+
+.login-btn{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="title">ADMIN PANEL</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <input id="number" class="input" placeholder="509XXXXXXXX">
+
+  <div class="row">
+    <button class="btn-check" id="btnCheck">Check</button>
+    <button class="btn-delete" id="btnDelete">Delete</button>
+    <button class="btn-clear" id="btnClear">Clear</button>
+  </div>
+
+  <div id="status" class="status">Waiting action...</div>
+
+  <div class="footer">YOU MD BOT SECURE SYSTEM</div>
+
+</div>
+
+<!-- LOGIN -->
+<div id="loginOverlay" class="overlay">
+  <div class="login-card">
+    <div class="title">LOGIN</div>
+    <input type="password" id="adminPass" class="login-input" placeholder="Password">
+    <button class="login-btn" id="btnLogin">Access</button>
+    <div id="loginMsg" style="color:red;margin-top:10px;"></div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = "adminowner";
+const apiPath = "/api/session/delete";
+
+const el = id => document.getElementById(id);
+
+function show(msg,type=""){
+  const box = el("status");
+  box.innerHTML = msg;
+  box.className = "status " + type;
+}
+
+function sanitize(n){
+  return (n||"").replace(/[^0-9]/g,"");
+}
+
+/* AUTH */
+function checkAuth(){
+  if(sessionStorage.getItem("auth")!=="1"){
+    el("loginOverlay").style.display="flex";
+    return false;
+  }
+  return true;
+}
+
+el("btnLogin").onclick = ()=>{
+  if(el("adminPass").value === PASSWORD){
+    sessionStorage.setItem("auth","1");
+    el("loginOverlay").style.display="none";
+    show("✅ Connected","success");
+  }else{
+    el("loginMsg").innerText="Wrong password";
+  }
+};
+
+/* ACTIONS */
+el("btnCheck").onclick = ()=>{
+  if(!checkAuth()) return;
+  const n = sanitize(el("number").value);
+  if(!n) return show("Invalid number","error");
+  show("Detected: "+n);
+};
+
+el("btnClear").onclick = ()=>{
+  if(!checkAuth()) return;
+  el("number").value="";
+  show("Cleared");
+};
+
+el("btnDelete").onclick = async ()=>{
+  if(!checkAuth()) return;
+
+  const n = sanitize(el("number").value);
+  if(!n) return show("Invalid number","error");
+
+  if(!confirm("Delete "+n+" ?")) return;
+
+  show("Loading...");
+
+  try{
+    const r = await fetch(apiPath,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({number:n})
+    });
+
+    const d = await r.json();
+
+    if(d.ok){
+      show("✅ "+d.message,"success");
+    }else{
+      show("❌ "+(d.error||"Error"),"error");
+    }
+
+  }catch(e){
+    show("Network error","error");
+  }
+};
+
+/* INIT */
+window.onload = ()=>{
+  if(!checkAuth()){
+    el("loginOverlay").style.display="flex";
+  }else{
+    el("loginOverlay").style.display="none";
+  }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supprimer Sessions</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* STYLE TEXTE OOLICE 🔥 */
+.title{
+  font-size:22px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glowMove 3s linear infinite;
+  letter-spacing:1px;
+  text-shadow:0 0 10px rgba(0,255,166,0.3),
+               0 0 20px rgba(0,207,255,0.2);
+}
+
+@keyframes glowMove{
+  0%{ background-position:0%;}
+  100%{ background-position:200%;}
+}
+
+/* LOGO */
+.logo{
+  width:100px;
+  height:100px;
+  object-fit:contain;
+}
+
+/* WARNING */
+.warning-box{
+  border:1px solid #1c2a40;
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  margin-bottom:15px;
+}
+
+.warning-title{
+  color:#ff6b6b;
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+.warning-text{
+  font-size:13px;
+  color:#8fa3c1;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#ff4d4d,#ff0000);
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  margin-bottom:20px;
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+}
+
+/* RESULT */
+.result-box{
+  border:1px solid #1c2a40;
+  border-radius:20px;
+  padding:15px;
+  text-align:center;
+}
+
+.result{
+  font-size:14px;
+  color:#8fa3c1;
+}
+
+/* STATES */
+.success{
+  color:#00ffa6;
+}
+
+.error{
+  color:#ff6b6b;
+}
+
+/* LOADER */
+.loader{
+  border:3px solid #1c2a40;
+  border-top:3px solid #00ffa6;
+  border-radius:50%;
+  width:20px;
+  height:20px;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+
+@keyframes spin{
+  0%{ transform:rotate(0deg);}
+  100%{ transform:rotate(360deg);}
+}
+
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="title">DELETE SESSIONS</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="warning-box">
+    <div class="warning-title">⚠️ Action irréversible</div>
+    <div class="warning-text">
+      Toutes les sessions seront supprimées définitivement.
+    </div>
+  </div>
+
+  <button class="btn" id="deleteAllBtn">🗑️ Supprimer toutes les sessions</button>
+
+  <div class="result-box">
+    <div class="result" id="result">Aucune action pour le moment</div>
+  </div>
+
+  <div class="footer">
+    Secure session management system.
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+
+<script>
+const deleteAllBtn = document.getElementById("deleteAllBtn");
+const resultDiv = document.getElementById("result");
+
+deleteAllBtn.addEventListener("click", async () => {
+
+  resultDiv.innerHTML = "<div class='loader'></div>";
+
+  try {
+    const response = await axios.post("/api/session/deleteAll");
+    const data = response.data;
+
+    if (data.ok) {
+      resultDiv.innerHTML = "<span class='success'>" + data.message + "</span>";
+    } else {
+      resultDiv.innerHTML = "<span class='error'>Erreur: " + (data.error || "Impossible") + "</span>";
+    }
+
+  } catch (err) {
+    resultDiv.innerHTML = "<span class='error'>Erreur de connexion</span>";
+  }
+});
+</script>
+
+</body>
+</html>

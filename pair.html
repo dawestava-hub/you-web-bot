@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Pairing</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.header h1{
+  font-size:20px;
+  font-weight:600;
+}
+
+.logo{
+  width:100px;
+  height:100px;
+  object-fit:contain;
+}
+
+.label{
+  font-size:12px;
+  color:#8fa3c1;
+  margin-bottom:5px;
+}
+
+.input{
+  width:100%;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:15px;
+  font-size:16px;
+  color:white;
+  outline:none;
+}
+
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  margin-bottom:20px;
+}
+
+.code-box{
+  border:1px solid #1c2a40;
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+}
+
+.code-title{
+  display:flex;
+  justify-content:space-between;
+  color:#00ffa6;
+  font-size:14px;
+  margin-bottom:15px;
+}
+
+.copy-btn{
+  cursor:pointer;
+}
+
+.code{
+  font-size:18px;
+  letter-spacing:2px;
+  color:#8fa3c1;
+  margin-bottom:15px;
+}
+
+.code.active{
+  font-size:32px;
+  letter-spacing:5px;
+  color:#00ffa6;
+}
+
+.steps{
+  font-size:12px;
+  color:#8fa3c1;
+}
+
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Quick Pairing</h1>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="label">INSTANCE PHONE NUMBER</div>
+  <input class="input" id="phone" placeholder="509XXXXXXXX">
+
+  <button class="btn" onclick="generateCode()">🔑 Generate code</button>
+
+  <div class="code-box">
+    <div class="code-title">
+      <span>🔒 PAIRING CODE</span>
+      <span class="copy-btn" onclick="copyCode()">📋 Copy</span>
+    </div>
+
+    <div class="code" id="pairCode">wait your code</div>
+
+    <div class="steps">
+      WhatsApp → Linked Devices → Link with phone number → Enter this code
+    </div>
+  </div>
+
+  <div class="footer">
+    Secure pairing over cloud infrastructure.
+  </div>
+
+</div>
+
+<script>
+
+async function generateCode(){
+
+  const phone = document.getElementById("phone").value.trim();
+  const el = document.getElementById("pairCode");
+
+  if(!phone){
+    alert("Enter phone number");
+    return;
+  }
+
+  el.innerText = "Generating...";
+  el.classList.remove("active");
+
+  try{
+
+    const res = await fetch("/pair",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ phone })
+    });
+
+    const data = await res.json();
+
+    if(res.ok && data.code){
+      el.innerText = data.code;
+      el.classList.add("active");
+    }else{
+      el.innerText = "Error";
+      alert(data.error || "Failed");
+    }
+
+  }catch(e){
+    el.innerText = "Server Error";
+  }
+}
+
+function copyCode(){
+
+  const code = document.getElementById("pairCode").innerText;
+
+  if(code === "wait your code" || code === "Generating..." || code === "Error"){
+    alert("Generate code first!");
+    return;
+  }
+
+  navigator.clipboard.writeText(code).then(()=>{
+    alert("Copied: " + code);
+  });
+
+}
+
+</script>
+
+</body>
+</html>
