@@ -2,7 +2,7 @@ const {
     proto,
     downloadContentFromMessage,
     getContentType
-} = require('baileys')
+} = require('@ryuu-reinzz/baileys')
 const fs = require('fs')
 
 
