@@ -9982,7 +9982,8 @@ END:VCARD`
   break;
 }
 
-
+// CID 
+          
 case 'cid': {
   try {
 
@@ -10023,13 +10024,7 @@ END:VCARD`
 
     if (!channelLink) {
       return await socket.sendMessage(sender, {
-        text: `
-╭┄『 ⊹ ࣪𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 ⊹ ࣪ 』
-│. • sᴛᴀᴛᴜs : ᴇʀʀᴏʀ ❌
-│. • ᴍᴇssᴀɢᴇ : ɴᴏ ʟɪɴᴋ ᴘʀᴏᴠɪᴅᴇᴅ
-│. • ᴜsᴀɢᴇ : .ᴄɪᴅ <ᴄʜᴀɴɴᴇʟ ʟɪɴᴋ>
-╰┄『 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝐌𝐎𝐃𝐔𝐋𝐄 』
-`
+        text: `❌ Aucun lien fourni\nUsage: .cid <lien>`
       }, { quoted: shonux });
     }
 
@@ -10037,13 +10032,7 @@ END:VCARD`
 
     if (!match) {
       return await socket.sendMessage(sender, {
-        text: `
-╭┄『 ⊹ ࣪𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 ⊹ ࣪ 』
-│. • sᴛᴀᴛᴜs : ɪɴᴠᴀʟɪᴅ ❌
-│. • ʀᴇᴀsᴏɴ : ғᴏʀᴍᴀᴛ ɴᴏɴ sᴜᴘᴘᴏʀᴛᴇᴅ
-│. • ᴇxᴘ : https://whatsapp.com/channel/xxxx
-╰┄『 𝐂𝐈𝐃 𝐌𝐎𝐃𝐔𝐋𝐄 』
-`
+        text: `❌ Lien invalide`
       }, { quoted: shonux });
     }
 
@@ -10056,160 +10045,77 @@ END:VCARD`
     const now = Date.now();
 
     if (cached && (now - cached._ts) < (10 * 60 * 1000)) {
-
       const metadata = cached.metadata;
 
-      const text = `
-╭┄『 ⊹ ࣪𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 ⊹ ࣪ 』
-│✵ ᴄʜᴀɴɴᴇʟ ɪɴғᴏ (ᴄᴀᴄʜᴇ)
-│✵ ɪᴅ : ${metadata.id}
-│✵ ɴᴀᴍᴇ : ${metadata.name || 'unknown'}
-╰┄『 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝐃𝐀𝐓𝐀 』
-`;
-
       await socket.sendMessage(sender, {
-        text
+        text: `📡 ID: ${metadata.id}\n📌 Nom: ${metadata.name || 'unknown'}`
       }, { quoted: shonux });
 
       break;
     }
 
     await socket.sendMessage(sender, {
-      text: `
-╭┄『 ⊹ ࣪𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 ⊹ ࣪ 』
-│. • sᴛᴀᴛᴜs : ᴘʀᴏᴄᴇssɪɴɢ ⏳
-│. • ᴍᴏᴅᴜʟᴇ : ᴄʜᴀɴɴᴇʟ ɪɴғᴏ
-╰┄『 𝐂𝐈𝐃 𝐒𝐘𝐒𝐓𝐄𝐌 』
-`
+      text: `⏳ Récupération des infos...`
     }, { quoted: shonux });
 
-    // 👉 Ici ton reste logique API inchangé
-    // (tu peux garder ton code existant après ce point)
+    const withTimeout = (p, ms = 15000) =>
+      Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
 
-  } catch (e) {
-    console.error('[CID ERROR]', e);
-
-    const shonux = {
-      key: {
-        remoteJid: "status@broadcast",
-        participant: "0@s.whatsapp.net",
-        fromMe: false,
-        id: "META_AI_CID_ERR"
-      },
-      message: {
-        contactMessage: {
-          displayName: '𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓',
-          vcard: `BEGIN:VCARD
-VERSION:3.0
-N:YOU WEB BOT;;;;
-FN:YOU WEB BOT
-ORG:𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓
-TEL;type=CELL;type=VOICE;waid=50941319791:+509 4131 9791
-END:VCARD`
-        }
-      }
-    };
-
-    await socket.sendMessage(sender, {
-      text: `
-╭┄『 ⊹ ࣪𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 ⊹ ࣪ 』
-│. • sᴛᴀᴛᴜs : ᴇʀʀᴏʀ ❌
-│. • ᴍᴇssᴀɢᴇ : ${e.message}
-╰┄『 𝐂𝐈𝐃 𝐄𝐑𝐑𝐎𝐑 』
-`
-    }, { quoted: shonux });
-  }
-  break;
-}
-
-    // --- Indiquer que l'on récupère les infos
-    await socket.sendMessage(sender, { text: `🔎 Récupération des informations du channel : *${inviteId}*` }, { quoted: shonux });
-
-    // --- Wrapper timeout pour appels asynchrones
-    const withTimeout = (p, ms = 15000) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
-
-    // --- Récupérer les métadonnées via l'API Baileys si disponible
     let metadata = null;
+
     try {
       if (typeof socket.newsletterMetadata === 'function') {
         metadata = await withTimeout(socket.newsletterMetadata("invite", inviteId), 15000);
       } else if (typeof socket.getNewsletterMetadata === 'function') {
         metadata = await withTimeout(socket.getNewsletterMetadata(inviteId), 15000);
-      } else {
-        throw new Error('newsletterMetadata non disponible sur le socket');
       }
     } catch (errMeta) {
-      console.warn('[CID] échec récupération metadata', errMeta?.message || errMeta);
-      metadata = null;
+      console.warn('[CID] metadata error', errMeta?.message || errMeta);
     }
 
     if (!metadata || !metadata.id) {
       return await socket.sendMessage(sender, {
-        text: '❌ Channel introuvable ou inaccessible. Il peut être privé ou l’API ne fournit pas ses métadonnées.'
+        text: '❌ Channel introuvable'
       }, { quoted: shonux });
     }
 
     const normalized = {
       id: metadata.id || inviteId,
-      name: metadata.name || metadata.title || null,
-      subscribers: (typeof metadata.subscribers === 'number') ? metadata.subscribers : (metadata.subscriberCount || metadata.followers || null),
-      creation_time: metadata.creation_time || metadata.createdAt || metadata.created_at || null,
-      preview: metadata.preview || metadata.thumbnail || metadata.image || null,
-      description: metadata.description || metadata.about || null,
-      category: metadata.category || null,
-      owner: metadata.owner || metadata.creator || null
+      name: metadata.name || metadata.title || 'unknown',
+      subscribers: metadata.subscribers || null,
+      preview: metadata.preview || null
     };
 
-    // --- Persister dans le cache mémoire
-    global.__whatsapp_channel_cache.set(cacheKey, { metadata: normalized, _ts: Date.now() });
+    global.__whatsapp_channel_cache.set(cacheKey, {
+      metadata: normalized,
+      _ts: Date.now()
+    });
 
-    // --- Construire le texte d'information
-    function buildChannelInfoText(md, botNameLocal) {
-      const lines = [];
-      lines.push('╭┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ᕗ');
-      lines.push('📡 *𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝐈𝐍𝐅𝐎𝐒*');
-      lines.push(`│. ˚˖𓍢ִ໋🆔 *ɪᴅ:* ${md.id}`);
-      if (md.name) lines.push(`📌 *ɴᴏᴍ:* ${md.name}`);
-      if (md.subscribers !== null && md.subscribers !== undefined) lines.push(`│. ˚˖𓍢ִ໋👥 *ᴀʙᴏɴɴᴇ́s:* ${Number(md.subscribers).toLocaleString()}`);
-      if (md.creation_time) {
-        try {
-          const ts = Number(md.creation_time);
-          const dateStr = isNaN(ts) ? String(md.creation_time) : new Date(ts * 1000).toLocaleString();
-          lines.push(`│. ˚˖𓍢ִ໋📅 *ᴄʀᴇ́ᴇ́ ʟᴇ:* ${dateStr}`);
-        } catch { lines.push(`│. ˚˖𓍢ִ໋📅 *ᴄʀᴇ́ᴇ́ ʟᴇ:* ${md.creation_time}`); }
-      }
-      if (md.category) lines.push(`│. ˚˖𓍢ִ໋🏷️ *ᴄᴀᴛᴇ́ɢᴏʀɪᴇ:* ${md.category}`);
-      if (md.owner) lines.push(`│. ˚˖𓍢ִ໋👤 *ᴘʀᴏᴘʀɪᴇ́ᴛᴀɪʀᴇ:* ${md.owner}`);
-      if (md.description) lines.push('');
-      if (md.description) lines.push(`│. ˚˖𓍢ִ໋📝 ${md.description}`);
-      lines.push('╰┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ᕗ');
-      lines.push(`> _© ᴘʀᴏᴘᴜʟsᴇ́ ᴘᴀʀ ʏᴏᴜ ᴛᴇᴄʜx ᴏғᴄ_`);
-      return lines.join('\n');
-    }
+    const infoText = `📡 ID: ${normalized.id}
+📌 Nom: ${normalized.name}
+👥 Abonnés: ${normalized.subscribers || 'N/A'}`;
 
-    function normalizePreviewUrl(preview) {
-      if (!preview) return null;
-      if (preview.startsWith('http')) return preview;
-      return `https://pps.whatsapp.net${preview}`;
-    }
+    const previewUrl = normalized.preview
+      ? (normalized.preview.startsWith('http')
+        ? normalized.preview
+        : `https://pps.whatsapp.net${normalized.preview}`)
+      : null;
 
-    const infoText = buildChannelInfoText(normalized, botName);
-    const previewUrl = normalizePreviewUrl(normalized.preview);
-
-    // --- Construire le message interactif avec bouton "copy"
     const interactive = {
       viewOnceMessage: {
         message: {
           interactiveMessage: {
             body: { text: infoText },
-            footer: { text: `© ${botName}` },
-            header: previewUrl ? { imageMessage: { url: previewUrl } } : { title: "Channel Info" },
+            footer: { text: botName },
+            header: previewUrl
+              ? { imageMessage: { url: previewUrl } }
+              : { title: "Channel Info" },
             nativeFlowMessage: {
               buttons: [
                 {
                   name: "cta_copy",
                   buttonParamsJson: JSON.stringify({
-                    display_text: "📋 ᴄᴏᴘɪᴇʀ ʟ'ɪᴅ",
+                    display_text: "📋 Copier ID",
                     id: "copy_id",
                     copy_code: normalized.id
                   })
@@ -10221,15 +10127,20 @@ END:VCARD`
       }
     };
 
-    // --- Envoyer le message interactif (relay) ; fallback sur texte si échec
     try {
-      await socket.relayMessage(sender, interactive.viewOnceMessage.message, { messageId: `cid_${inviteId}_${Date.now()}` });
+      await socket.relayMessage(sender, interactive.viewOnceMessage.message, {
+        messageId: `cid_${inviteId}_${Date.now()}`
+      });
     } catch (errRelay) {
-      console.warn('[CID] relay interactive failed, fallback to text', errRelay?.message || errRelay);
+      console.warn('[CID] fallback', errRelay?.message || errRelay);
+
       if (previewUrl) {
         try {
-          await socket.sendMessage(sender, { image: { url: previewUrl }, caption: infoText }, { quoted: shonux });
-        } catch (e) {
+          await socket.sendMessage(sender, {
+            image: { url: previewUrl },
+            caption: infoText
+          }, { quoted: shonux });
+        } catch {
           await socket.sendMessage(sender, { text: infoText }, { quoted: shonux });
         }
       } else {
@@ -10238,13 +10149,13 @@ END:VCARD`
     }
 
   } catch (err) {
-    console.error("Erreur commande CID :", err);
-    try {
-      await socket.sendMessage(sender, {
-        text: '⚠️ Une erreur inattendue est survenue lors de la récupération des informations du channel. Veuillez réessayer plus tard.'
-      }, { quoted: shonux });
-    } catch (e) { /* ignore */ }
+    console.error("Erreur CID :", err);
+
+    await socket.sendMessage(sender, {
+      text: `❌ Erreur: ${err.message}`
+    }, { quoted: msg });
   }
+
   break;
 }
 
