@@ -1,5 +1,5 @@
 // status.js
-const { generateWAMessageContent, generateWAMessageFromContent } = require("baileys");
+const { generateWAMessageContent, generateWAMessageFromContent } = require("@ryuu-reinzz/baileys");
 const crypto = require("crypto");
 
 async function groupStatus(socket, jid, content) {
