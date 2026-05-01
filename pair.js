@@ -36,7 +36,7 @@ const {
   setGoodbyeTemplate,
   handleParticipantUpdate
 } = require('./welcome_goodbye');
-const translate = require('google-translate-api');
+const translate = require('@vitalets/google-translate-api');
 const {
   default: makeWASocket,
   useMultiFileAuthState,
