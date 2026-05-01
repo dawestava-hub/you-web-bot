@@ -46,7 +46,7 @@ const {
   Browsers,
   downloadContentFromMessage,
   DisconnectReason
-} = require('@whiskeysockets/baileys');
+} = require('baileys');
 const { jidNormalizedUser } = require('baileys')
 // Au début de ton fichier, après les imports
 if (!global.scheduledRestart) {
