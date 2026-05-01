@@ -1,12 +1,18 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require("body-parser");
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import events from 'events';
+import code from './pair.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 2001;
 
-let code = require('./pair'); 
-
-require('events').EventEmitter.defaultMaxListeners = 500;
+events.EventEmitter.defaultMaxListeners = 500;
 
 // Middleware
 app.use(bodyParser.json());
@@ -31,7 +37,6 @@ app.get('/', (req, res) => {
 });
 
 // ===== SERVIR LES FICHIERS STATIQUES DU DASHBOARD =====
-// IMPORTANT: Cette ligne doit être AVANT vos routes /dashboard
 app.use('/dashboard', express.static(path.join(process.cwd(), 'dashboard_static')));
 
 // ===== VOS AUTRES ROUTES API =====
@@ -61,7 +66,7 @@ app.post('/api/session/delete', requireAdminPass, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╭┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ᕗ
-│  𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 𝐃𝐀𝐒𝐇𝐁𝐎𝐎𝐑𝐃 𝐒𝐄𝐑𝐕𝐄𝐑      
+│  𝐘𝐎𝐔 𝐖𝐄𝐁 𝐁𝐎𝐓 𝐃𝐀𝐒𝐇𝐁𝐎𝐀𝐑𝐃 𝐒𝐄𝐑𝐕𝐄𝐑      
 │
 │  Server running on:                
 │  http://localhost:${PORT}                
@@ -74,4 +79,4 @@ app.listen(PORT, () => {
 `);
 });
 
-module.exports = app;
+export default app;
