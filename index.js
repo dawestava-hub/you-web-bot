@@ -1,13 +1,8 @@
-import express from 'express';
-import path from 'path';
-import bodyParser from 'body-parser';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import events from 'events';
-import pairRouter from './pair.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const events = require('events');
+const pairRouter = require('./pair.js');
 
 const app = express();
 const PORT = process.env.PORT || 2001;
@@ -79,4 +74,4 @@ app.listen(PORT, () => {
 `);
 });
 
-export default app;
+module.exports = app;
