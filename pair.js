@@ -46,8 +46,8 @@ const {
   Browsers,
   downloadContentFromMessage,
   DisconnectReason
-} = require('baileys');
-const { jidNormalizedUser } = require('baileys')
+} = require('@ryuu-reinzz/baileys');
+const { jidNormalizedUser } = require('@ryuu-reinzz/baileys')
 // Au début de ton fichier, après les imports
 if (!global.scheduledRestart) {
     global.scheduledRestart = null;
