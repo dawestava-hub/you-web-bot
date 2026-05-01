@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import events from 'events';
-import code from './pair.js';
+import pairRouter from './pair.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use('/code', code);
+app.use('/code', pairRouter);
 
 // Page de pairing
 app.get('/pair', (req, res) => {
