@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des Newsletters - YOU WEB BOT</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:#050b14;
+    min-height:100vh;
+    padding:12px;
+    color:white;
+}
+
+/* CONTAINER */
+.container{
+    max-width:650px;
+    margin:0 auto;
+    background:#0a1220;
+    border-radius:18px;
+    padding:1.5rem;
+    border:1px solid #1c2a40;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+/* HEADER UNIQUE (NO LINE UNDER) */
+.top-box{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+/* TITRE NEON */
+.title{
+    font-size:18px;
+    font-weight:700;
+    background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+    background-size:200%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite;
+}
+
+@keyframes shine{
+    0%{background-position:0%}
+    100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+    width:55px;
+    height:55px;
+    object-fit:contain;
+}
+
+/* H1 SIMPLE */
+h1{
+    font-size:16px;
+    margin-bottom:10px;
+    color:#8fa3c1;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    font-size:13px;
+}
+
+th, td{
+    padding:0.8rem;
+    border-bottom:1px solid #1c2a40;
+}
+
+th{
+    color:#00cfff;
+    background:#0f1a2e;
+}
+
+tr:hover{
+    background:#111c33;
+}
+
+/* EMOJIS */
+.emoji-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+}
+
+.emoji-badge{
+    background:#00cfff;
+    color:black;
+    padding:3px 7px;
+    border-radius:12px;
+    font-size:0.75rem;
+}
+
+/* DELETE BUTTON */
+.btn-delete{
+    background:linear-gradient(90deg,#ff4d4d,#ff1a75);
+    color:white;
+    border:none;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+}
+
+/* LOADING */
+.loading{
+    text-align:center;
+    padding:1.5rem;
+    color:#8fa3c1;
+}
+
+/* ERROR */
+.error{
+    background:#3d0000;
+    color:#ff4d4d;
+    padding:1rem;
+    border-radius:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER UNIQUE SANS TRAIT -->
+    <div class="top-box">
+        <div class="title">YOU WEB BOT</div>
+        <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+    </div>
+
+    <h1>📬 Newsletters</h1>
+
+    <div id="content">
+        <div class="loading">Chargement...</div>
+    </div>
+
+    <table id="newsletterTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>JID</th>
+                <th>Emojis</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="newsletterList"></tbody>
+    </table>
+
+</div>
+
+<script>
+async function loadNewsletters(){
+    try{
+        const response = await fetch('/api/newsletters');
+        const data = await response.json();
+
+        const table = document.getElementById('newsletterTable');
+        const tbody = document.getElementById('newsletterList');
+        const content = document.getElementById('content');
+
+        if(data.ok && data.list){
+
+            if(data.list.length === 0){
+                content.innerHTML = '<div class="error">Aucune newsletter trouvée</div>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            data.list.forEach(news=>{
+                const row = tbody.insertRow();
+
+                const jidCell = row.insertCell();
+                jidCell.textContent = news.jid || news;
+
+                const emojiCell = row.insertCell();
+                const wrap = document.createElement('div');
+                wrap.className = 'emoji-list';
+
+                (news.emojis || []).forEach(e=>{
+                    const span = document.createElement('span');
+                    span.className = 'emoji-badge';
+                    span.textContent = e;
+                    wrap.appendChild(span);
+                });
+
+                emojiCell.appendChild(wrap);
+
+                const actionCell = row.insertCell();
+                const btn = document.createElement('button');
+                btn.className = 'btn-delete';
+                btn.textContent = 'Supprimer';
+                btn.onclick = ()=>deleteNewsletter(news.jid || news);
+                actionCell.appendChild(btn);
+            });
+
+            table.style.display='table';
+            content.style.display='none';
+        }
+
+    }catch(err){
+        document.getElementById('content').innerHTML =
+        '<div class="error">Erreur: '+err.message+'</div>';
+    }
+}
+
+async function deleteNewsletter(jid){
+    if(!confirm(`Supprimer ${jid} ?`)) return;
+
+    try{
+        const res = await fetch('/newsletter/remove',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({jid})
+        });
+
+        const data = await res.json();
+
+        if(res.ok){
+            alert('Supprimée avec succès');
+            loadNewsletters();
+        }else{
+            alert('Erreur: '+data.error);
+        }
+
+    }catch(e){
+        alert('Erreur: '+e.message);
+    }
+}
+
+loadNewsletters();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supprimer Newsletter - YOU WEB BOT</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#050b14;
+    min-height:100vh;
+    padding:12px;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CONTAINER */
+.container {
+    max-width:600px;
+    width:100%;
+    background:#0a1220;
+    border-radius:18px;
+    padding:1.5rem;
+    border:1px solid #1c2a40;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+/* TOP BOX */
+.top-box{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.title{
+    font-size:18px;
+    font-weight:700;
+    background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+    background-size:200%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite;
+}
+
+@keyframes shine{
+    0%{background-position:0%}
+    100%{background-position:200%}
+}
+
+.logo{
+    width:60px;
+    height:60px;
+    object-fit:contain;
+}
+
+/* TITRE */
+h1 {
+    color:#00cfff;
+    margin-bottom:1rem;
+    font-size:18px;
+}
+
+/* BACK LINK */
+.back-link {
+    display:inline-block;
+    margin-bottom:10px;
+    color:#8fa3c1;
+    text-decoration:none;
+    font-size:13px;
+}
+
+/* FORM */
+.form-group {
+    margin-bottom:1rem;
+}
+
+label {
+    display:block;
+    margin-bottom:5px;
+    color:#8fa3c1;
+    font-size:13px;
+}
+
+select, input {
+    width:100%;
+    padding:10px;
+    border:1px solid #1c2a40;
+    border-radius:10px;
+    font-size:14px;
+    background:#050b14;
+    color:white;
+    outline:none;
+}
+
+/* BUTTON */
+.btn-delete {
+    background:linear-gradient(90deg,#ff4d4d,#ff1a75);
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    width:100%;
+    transition:0.3s;
+}
+
+.btn-delete:hover {
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(255,0,80,0.3);
+}
+
+/* MESSAGE */
+.message {
+    padding:10px;
+    border-radius:10px;
+    margin:10px 0;
+    display:none;
+    font-size:13px;
+}
+
+.message.success {
+    background:#00ffa6;
+    color:black;
+    display:block;
+}
+
+.message.error {
+    background:#ff4d4d;
+    color:white;
+    display:block;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top-box">
+        <div class="title">YOU WEB BOT</div>
+        <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+    </div>
+
+    <a href="/dashboard" class="back-link">← Retour</a>
+
+    <h1>🗑️ delelete Newsletter</h1>
+
+    <div id="message" class="message"></div>
+
+    <form id="deleteForm">
+        <div class="form-group">
+            <label for="jid">Sélectionnez la newsletter:</label>
+            <select id="jid" name="jid" required>
+                <option value="">Chargement...</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-delete">Supprimer la Newsletter</button>
+    </form>
+
+</div>
+
+<script>
+async function loadNewsletters() {
+    try {
+        const response = await fetch('/api/newsletters');
+        const data = await response.json();
+        const select = document.getElementById('jid');
+
+        if (data.ok && data.list) {
+            select.innerHTML = '<option value="">Sélectionnez une newsletter</option>';
+            data.list.forEach(news => {
+                const option = document.createElement('option');
+                option.value = news.jid || news;
+                option.textContent = news.jid || news;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        select.innerHTML = '<option value="">Erreur de chargement</option>';
+    }
+}
+
+document.getElementById('deleteForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const jid = document.getElementById('jid').value;
+    if (!jid) return alert('Veuillez sélectionner une newsletter');
+
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${jid} ?`)) return;
+
+    const messageDiv = document.getElementById('message');
+    messageDiv.className = 'message';
+    messageDiv.textContent = 'Suppression en cours...';
+
+    try {
+        const response = await fetch('/newsletter/remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jid })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            messageDiv.className = 'message success';
+            messageDiv.textContent = 'Newsletter supprimée avec succès!';
+            loadNewsletters();
+        } else {
+            messageDiv.className = 'message error';
+            messageDiv.textContent = 'Erreur: ' + data.error;
+        }
+
+    } catch (error) {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = 'Erreur: ' + error.message;
+    }
+});
+
+loadNewsletters();
+</script>
+
+</body>
+</html>

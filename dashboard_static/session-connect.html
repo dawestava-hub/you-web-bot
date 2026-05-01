@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecter Session</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* 🌈 TEXTE COLORÉ */
+.header h1{
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#7a5cff,#00ffa6);
+  background-size:300%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+}
+
+@keyframes shine{
+  0%{background-position:0%}
+  100%{background-position:300%}
+}
+
+/* LOGO */
+.logo{
+  width:100px;
+  height:100px;
+  object-fit:contain;
+}
+
+/* LABEL */
+.label{
+  font-size:12px;
+  color:#8fa3c1;
+  margin-bottom:5px;
+}
+
+/* INPUT */
+.input{
+  width:100%;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:15px;
+  font-size:16px;
+  color:white;
+  outline:none;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  margin-bottom:20px;
+}
+
+/* QR BOX */
+.qr-box{
+  border:1px solid #1c2a40;
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  display:none;
+}
+
+.qr-title{
+  font-size:14px;
+  margin-bottom:15px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.qr-box img{
+  max-width:250px;
+  border-radius:10px;
+}
+
+.status{
+  margin-top:10px;
+  font-size:12px;
+  color:#8fa3c1;
+}
+
+/* FOOTER */
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>YOU WEB BOT</h1>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="label">NUMÉRO (format international)</div>
+  <input class="input" id="number" placeholder="509XXXXXXXX">
+
+  <button class="btn" onclick="connect()">🔌 Connecter</button>
+
+  <div class="qr-box" id="qrBox">
+    <div class="qr-title">SCAN QR CODE</div>
+    <img id="qrImg" src="">
+    <div class="status" id="status">En attente...</div>
+  </div>
+
+  <div class="footer">
+    Secure connection system
+  </div>
+
+</div>
+
+<script>
+let eventSource;
+
+async function connect(){
+  const number = document.getElementById("number").value;
+
+  const res = await fetch(`/?number=${number}`);
+  const data = await res.json();
+
+  const box = document.getElementById("qrBox");
+  const status = document.getElementById("status");
+
+  if(data.status === "already_connected"){
+    alert("Déjà connecté");
+    return;
+  }
+
+  box.style.display = "block";
+  status.innerText = "Génération du QR...";
+
+  if(eventSource) eventSource.close();
+
+  eventSource = new EventSource(`/qr-stream?number=${number}`);
+
+  eventSource.onmessage = (event)=>{
+    const d = JSON.parse(event.data);
+
+    if(d.qr){
+      document.getElementById("qrImg").src = d.qr;
+      status.innerText = "Scan le QR code";
+    }
+
+    if(d.status === "connected"){
+      status.innerText = "Connecté avec succès";
+      eventSource.close();
+    }
+  };
+}
+</script>
+
+</body>
+</html>

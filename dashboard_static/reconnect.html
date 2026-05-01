@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reconnecter Sessions - YOU WEB BOT</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+  border:1px solid #1c2a40;
+}
+
+/* BACK */
+.back{
+  color:#8fa3c1;
+  font-size:13px;
+  margin-bottom:10px;
+  display:inline-block;
+  text-decoration:none;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+/* TITLE STYLE */
+.title{
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s linear infinite;
+}
+
+@keyframes glow{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:15px;
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:scale(1.02);
+}
+
+/* INFO BOX */
+.info{
+  font-size:12px;
+  color:#8fa3c1;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  padding:10px;
+  border-radius:15px;
+  margin-bottom:15px;
+}
+
+/* PROGRESS */
+.progress{
+  width:100%;
+  height:10px;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:15px;
+  display:none;
+}
+
+.fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  transition:0.3s;
+}
+
+/* RESULT */
+.results{
+  margin-top:10px;
+}
+
+.item{
+  padding:10px;
+  border-radius:15px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  border:1px solid #1c2a40;
+  background:#050b14;
+}
+
+.success{ color:#00ffa6; }
+.fail{ color:#ff4d4d; }
+.already{ color:#00cfff; }
+
+.badge{
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:10px;
+  background:#1c2a40;
+}
+
+/* FOOTER */
+.footer{
+  margin-top:10px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a href="/dashboard" class="back">← Retour</a>
+
+  <div class="header">
+    <div class="title">YOU WEB BOT</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="info">
+    📡 Reconnexion automatique des sessions inactives avec délai de sécurité.
+  </div>
+
+  <button class="btn" id="btn">🔄 Lancer la reconnexion</button>
+
+  <div class="progress" id="progress">
+    <div class="fill" id="fill"></div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <div class="footer">YOU WEB BOT SYSTEM</div>
+
+</div>
+
+<script>
+document.getElementById("btn").addEventListener("click", async () => {
+
+  const btn = document.getElementById("btn");
+  const progress = document.getElementById("progress");
+  const fill = document.getElementById("fill");
+  const results = document.getElementById("results");
+
+  btn.disabled = true;
+  btn.innerText = "Connexion...";
+
+  progress.style.display = "block";
+  results.innerHTML = "";
+
+  try {
+    const res = await fetch("/reconnect");
+    const data = await res.json();
+
+    if(res.ok){
+
+      let done = 0;
+
+      data.connections.forEach((c, i) => {
+
+        setTimeout(() => {
+
+          const div = document.createElement("div");
+          div.className = "item";
+
+          if(c.status === "already_connected"){
+            div.innerHTML = `<span>${c.number}</span><span class="badge already">ALREADY</span>`;
+          }
+          else if(c.status === "connection_initiated"){
+            div.innerHTML = `<span>${c.number}</span><span class="badge success">CONNECTED</span>`;
+          }
+          else{
+            div.innerHTML = `<span>${c.number}</span><span class="badge fail">FAILED</span>`;
+          }
+
+          results.appendChild(div);
+
+          done++;
+          fill.style.width = (done / data.connections.length) * 100 + "%";
+
+        }, i * 120);
+
+      });
+
+    } else {
+      alert(data.error);
+    }
+
+  } catch(e){
+    alert("Erreur réseau");
+  }
+
+  setTimeout(()=>{
+    btn.disabled = false;
+    btn.innerText = "🔄 Lancer la reconnexion";
+  }, 2000);
+
+});
+</script>
+
+</body>
+</html>

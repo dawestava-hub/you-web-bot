@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect All Sessions</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+/* 🔥 OOLICE TEXT */
+.title{
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s linear infinite;
+}
+
+@keyframes glow{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+
+/* BACK */
+.back{
+  color:#8fa3c1;
+  font-size:13px;
+  margin-bottom:10px;
+  display:inline-block;
+  text-decoration:none;
+}
+
+/* WARNING */
+.warning{
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:15px;
+  padding:12px;
+  font-size:13px;
+  color:#8fa3c1;
+  margin-bottom:15px;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn:disabled{
+  opacity:0.6;
+}
+
+/* RESULT BOX */
+.results{
+  margin-top:15px;
+  display:none;
+}
+
+.results.show{
+  display:block;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  margin:8px 0;
+  border-radius:15px;
+  border:1px solid #1c2a40;
+  background:#050b14;
+}
+
+.badge{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.success{color:#00ffa6;}
+.already{color:#00cfff;}
+.failed{color:#ff4d4d;}
+
+/* FOOTER */
+.footer{
+  margin-top:10px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a href="/dashboard" class="back">← Retour</a>
+
+  <div class="header">
+    <div class="title">CONNECT SESSIONS</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="warning">
+    ⚠️ Cette action va connecter toutes les sessions enregistrées. Cela peut prendre quelques minutes.
+  </div>
+
+  <button class="btn" id="btn">🚀 Lancer connexion</button>
+
+  <div id="results" class="results"></div>
+
+  <div class="footer">YOU WEB BOT SYSTEM</div>
+
+</div>
+
+<script>
+const btn = document.getElementById("btn");
+const results = document.getElementById("results");
+
+btn.onclick = async ()=>{
+
+  btn.disabled = true;
+  btn.innerText = "Connexion...";
+
+  results.innerHTML = "";
+  results.classList.remove("show");
+
+  try{
+    const r = await fetch("/connect-all");
+    const d = await r.json();
+
+    results.classList.add("show");
+
+    d.connections.forEach(c=>{
+
+      let statusText = "";
+      let className = "";
+
+      if(c.status === "connection_initiated"){
+        statusText = "Connexion OK";
+        className = "success";
+      }
+      else if(c.status === "already_connected"){
+        statusText = "Déjà connecté";
+        className = "already";
+      }
+      else{
+        statusText = "Échec";
+        className = "failed";
+      }
+
+      const div = document.createElement("div");
+      div.className = "item";
+
+      div.innerHTML = `
+        <span>${c.number}</span>
+        <span class="badge ${className}">${statusText}</span>
+      `;
+
+      results.appendChild(div);
+    });
+
+  }catch(e){
+    alert("Erreur réseau");
+  }
+
+  btn.disabled = false;
+  btn.innerText = "🚀 Lancer connexion";
+};
+</script>
+
+</body>
+</html>

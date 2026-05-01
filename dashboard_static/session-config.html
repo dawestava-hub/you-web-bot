@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurer Session</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  padding:12px;
+  color:white;
+}
+
+/* CONTAINER SMALL */
+.container{
+  width:650px;
+  background:#0a1220;
+  border-radius:20px;
+  padding:18px;
+  border:1px solid #1c2a40;
+}
+
+/* HEADER UNIQUE */
+.top-box{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+/* TITLE COLORÉ */
+.title{
+  font-size:18px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#7a5cff,#00ffa6);
+  background-size:300%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 4s linear infinite;
+}
+
+@keyframes shine{
+  0%{background-position:0%}
+  100%{background-position:300%}
+}
+
+/* LOGO */
+.logo{
+  width:60px;
+  height:60px;
+  object-fit:contain;
+}
+
+/* TEXT */
+h2{
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+/* INFO BOX */
+.info-box{
+  background:#0f1a2e;
+  border-left:3px solid #00cfff;
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+  color:#8fa3c1;
+  margin-bottom:12px;
+}
+
+/* FORM */
+label{
+  font-size:12px;
+  color:#8fa3c1;
+  display:block;
+  margin-bottom:5px;
+}
+
+textarea,input{
+  width:100%;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:12px;
+  padding:10px;
+  color:white;
+  font-family:monospace;
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+textarea{
+  min-height:180px;
+}
+
+/* BUTTONS */
+.btn-otp,.btn-update{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:14px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:8px;
+}
+
+.btn-otp{
+  background:linear-gradient(90deg,#ffcc00,#ff8800);
+  color:black;
+}
+
+.btn-update{
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+}
+
+/* OTP */
+.otp-section{
+  display:none;
+  margin-top:10px;
+}
+
+/* MESSAGE */
+.message{
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+  display:none;
+  margin-bottom:10px;
+}
+
+.message.success{
+  background:#003d2e;
+  color:#00ffa6;
+  display:block;
+}
+
+.message.error{
+  background:#3d0000;
+  color:#ff4d4d;
+  display:block;
+}
+
+/* BACK */
+.back{
+  color:#8fa3c1;
+  font-size:12px;
+  text-decoration:none;
+  display:inline-block;
+  margin-bottom:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a class="back" href="/dashboard">← Retour</a>
+
+  <!-- HEADER UNIQUE -->
+  <div class="top-box">
+    <div class="title">YOU WEB BOT</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <h2>⚙️ Configurer Session</h2>
+
+  <div class="info-box">
+    OTP WhatsApp requis pour valider la configuration
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <label>Configuration JSON</label>
+  <textarea id="config"></textarea>
+
+  <button class="btn-otp" id="sendOtpBtn">📱 Envoyer OTP</button>
+
+  <div class="otp-section" id="otpSection">
+    <label>Code OTP</label>
+    <input id="otp" placeholder="XXXXXX">
+    <button class="btn-update" id="verifyOtpBtn">✅ Vérifier</button>
+  </div>
+
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const number = urlParams.get('number');
+
+async function loadConfig(){
+  if(!number) return;
+
+  const r = await fetch(`/api/session/config?number=${number}`);
+  const d = await r.json();
+
+  if(d.ok){
+    document.getElementById("config").value =
+    JSON.stringify(d.config,null,2);
+  }
+}
+
+document.getElementById("sendOtpBtn").onclick = async ()=>{
+  const config = document.getElementById("config").value;
+
+  try{ JSON.parse(config); }
+  catch(e){ return alert("JSON invalide"); }
+
+  const res = await fetch(`/update-config?number=${number}&config=${encodeURIComponent(config)}`);
+  const data = await res.json();
+
+  const msg = document.getElementById("message");
+
+  if(res.ok){
+    msg.className="message success";
+    msg.innerText="OTP envoyé";
+    document.getElementById("otpSection").style.display="block";
+  }else{
+    msg.className="message error";
+    msg.innerText=data.error;
+  }
+};
+
+document.getElementById("verifyOtpBtn").onclick = async ()=>{
+  const otp = document.getElementById("otp").value;
+
+  const res = await fetch(`/verify-otp?number=${number}&otp=${otp}`);
+  const data = await res.json();
+
+  const msg = document.getElementById("message");
+
+  if(res.ok){
+    msg.className="message success";
+    msg.innerText="Configuration mise à jour";
+    document.getElementById("otpSection").style.display="none";
+  }else{
+    msg.className="message error";
+    msg.innerText=data.error;
+  }
+};
+
+loadConfig();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOU WEB BOT - AJOUTER NEWSLETTER</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#050b14;
+    min-height:100vh;
+    padding:12px;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CONTAINER */
+.container{
+    max-width:600px;
+    width:100%;
+    background:#0a1220;
+    border-radius:18px;
+    padding:1.5rem;
+    border:1px solid #1c2a40;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+/* TOP BOX */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.title{
+    font-size:18px;
+    font-weight:700;
+    background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+    background-size:200%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:shine 3s linear infinite;
+}
+
+@keyframes shine{
+    0%{background-position:0%}
+    100%{background-position:200%}
+}
+
+.logo{
+    width:55px;
+    height:55px;
+    object-fit:contain;
+}
+
+/* TITRE SECTION */
+h2{
+    font-size:18px;
+    color:#00cfff;
+    margin-bottom:10px;
+}
+
+/* INPUTS */
+label{
+    display:block;
+    margin-top:12px;
+    margin-bottom:5px;
+    color:#8fa3c1;
+    font-size:13px;
+}
+
+input,textarea{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #1c2a40;
+    background:#050b14;
+    color:white;
+    outline:none;
+    font-size:14px;
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    font-size:14px;
+    cursor:pointer;
+    background:linear-gradient(90deg,#00ffa6,#00cfff);
+    color:black;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(0,255,166,0.3);
+}
+
+/* MESSAGE */
+.message{
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    font-size:13px;
+    display:none;
+}
+
+.success{
+    background:#00ffa6;
+    color:black;
+    display:block;
+}
+
+.error{
+    background:#ff4d4d;
+    color:white;
+    display:block;
+}
+
+/* HELP */
+.help{
+    font-size:11px;
+    color:#6c7a92;
+    margin-top:4px;
+}
+
+/* BACK */
+.back{
+    color:#8fa3c1;
+    text-decoration:none;
+    font-size:13px;
+    display:block;
+    margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="title">YOU WEB BOT</div>
+        <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+    </div>
+
+    <a href="/dashboard" class="back">← Retour Dashboard</a>
+
+    <h2>➕ Ajouter Newsletter</h2>
+
+    <div id="msg" class="message"></div>
+
+    <label>JID Newsletter</label>
+    <input id="jid" placeholder="123456789@newsletter">
+    <div class="help">Doit se terminer par @newsletter</div>
+
+    <label>Emojis</label>
+    <textarea id="emojis" rows="4" placeholder="👍, ❤️, 😂,🌹,🥷🏻,🪽,💖,💫"></textarea>
+    <div class="help">Séparer par virgule</div>
+
+    <button onclick="send()">Ajouter</button>
+
+</div>
+
+<script>
+async function send(){
+
+  const jid = document.getElementById("jid").value.trim();
+  const emojis = document.getElementById("emojis").value
+    .split(",")
+    .map(e=>e.trim())
+    .filter(Boolean);
+
+  const msg = document.getElementById("msg");
+  msg.style.display="block";
+  msg.className="message";
+  msg.innerText="Envoi...";
+
+  try{
+
+    const res = await fetch("/newsletter/add",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ jid, emojis })
+    });
+
+    const data = await res.json();
+
+    if(res.ok){
+      msg.className="message success";
+      msg.innerText="✅ Newsletter ajoutée avec succès";
+    }else{
+      msg.className="message error";
+      msg.innerText="❌ "+(data.error || "Erreur");
+    }
+
+  }catch(e){
+    msg.className="message error";
+    msg.innerText="❌ Erreur réseau";
+  }
+}
+</script>
+
+</body>
+</html>

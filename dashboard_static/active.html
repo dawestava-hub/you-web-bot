@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sessions Actives</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+/* 🔥 TEXTE OOLICE */
+.title{
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s linear infinite;
+}
+
+@keyframes glow{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+
+/* BACK */
+.back{
+  color:#8fa3c1;
+  font-size:13px;
+  margin-bottom:10px;
+  display:inline-block;
+  text-decoration:none;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  margin-bottom:15px;
+}
+
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.card{
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:15px;
+  padding:10px;
+  text-align:center;
+}
+
+.value{
+  font-size:20px;
+  font-weight:bold;
+  color:#00ffa6;
+}
+
+.label{
+  font-size:12px;
+  color:#8fa3c1;
+}
+
+/* LIST */
+.session-list{
+  margin-top:10px;
+}
+
+.session{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:15px;
+  margin-bottom:8px;
+}
+
+.number{
+  font-family:monospace;
+}
+
+.badge{
+  background:#00ffa6;
+  color:black;
+  padding:2px 8px;
+  border-radius:10px;
+  font-size:12px;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  color:#8fa3c1;
+  padding:20px;
+}
+
+/* FOOTER */
+.footer{
+  margin-top:10px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a href="/dashboard" class="back">← Retour</a>
+
+  <div class="header">
+    <div class="title">ACTIVE SESSIONS</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <button class="btn" onclick="load()">🔄 Actualiser</button>
+
+  <div class="stats">
+    <div class="card">
+      <div class="value" id="count">0</div>
+      <div class="label">Sessions</div>
+    </div>
+    <div class="card">
+      <div class="value" id="bot">-</div>
+      <div class="label">Bot</div>
+    </div>
+    <div class="card">
+      <div class="value" id="time">-</div>
+      <div class="label">Update</div>
+    </div>
+  </div>
+
+  <div id="list" class="session-list"></div>
+
+  <div class="footer">YOU WEB BOT MONITORING</div>
+
+</div>
+
+<script>
+async function load(){
+  try{
+    const r = await fetch('/active');
+    const d = await r.json();
+
+    document.getElementById('count').innerText = d.count || 0;
+    document.getElementById('bot').innerText = d.botName || "YOU WEB BOT";
+    document.getElementById('time').innerText = d.timestamp || "-";
+
+    const list = document.getElementById('list');
+
+    if(d.numbers && d.numbers.length){
+      list.innerHTML = "";
+
+      d.numbers.forEach(n=>{
+        const div = document.createElement('div');
+        div.className = "session";
+        div.innerHTML = `
+          <span class="number">${n}</span>
+          <span class="badge">ACTIVE</span>
+        `;
+        list.appendChild(div);
+      });
+
+    }else{
+      list.innerHTML = "<div class='empty'>📭 No active sessions</div>";
+    }
+
+  }catch(e){
+    alert("Erreur");
+  }
+}
+
+load();
+setInterval(load,10000);
+</script>
+
+</body>
+</html>

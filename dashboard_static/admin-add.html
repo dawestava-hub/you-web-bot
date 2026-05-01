@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ajouter Admin</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  background:#050b14;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:white;
+}
+
+/* CONTAINER */
+.container{
+  width:420px;
+  background:#0a1220;
+  border-radius:25px;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+/* 🔥 TEXTE OOLICE */
+.title{
+  font-size:20px;
+  font-weight:700;
+  background:linear-gradient(90deg,#00ffa6,#00cfff,#00ffa6);
+  background-size:200%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:glow 3s linear infinite;
+}
+
+@keyframes glow{
+  0%{background-position:0%}
+  100%{background-position:200%}
+}
+
+/* LOGO */
+.logo{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+}
+
+/* BACK */
+.back{
+  color:#8fa3c1;
+  font-size:13px;
+  margin-bottom:10px;
+  display:inline-block;
+  text-decoration:none;
+}
+
+/* BOX INFO */
+.info{
+  background:#050b14;
+  border:1px solid #1c2a40;
+  border-radius:15px;
+  padding:12px;
+  font-size:13px;
+  color:#8fa3c1;
+  margin-bottom:15px;
+}
+
+/* INPUT */
+.input{
+  width:100%;
+  padding:15px;
+  border-radius:15px;
+  border:1px solid #1c2a40;
+  background:#050b14;
+  color:white;
+  margin-bottom:15px;
+  outline:none;
+}
+
+/* BUTTON */
+.btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(90deg,#00ffa6,#00cfff);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* MESSAGE */
+.message{
+  margin-top:15px;
+  padding:12px;
+  border-radius:15px;
+  text-align:center;
+  font-size:14px;
+  display:none;
+}
+
+.success{color:#00ffa6;}
+.error{color:#ff4d4d;}
+
+/* FOOTER */
+.footer{
+  margin-top:10px;
+  font-size:12px;
+  color:#6c7a92;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <a href="/dashboard" class="back">← Retour</a>
+
+  <div class="header">
+    <div class="title">ADD ADMIN</div>
+    <img src="https://i.postimg.cc/tgN7HVPg/image.png" class="logo">
+  </div>
+
+  <div class="info">
+    <strong>Formats acceptés:</strong><br>
+    • 33612345678<br>
+    • 33612345678@s.whatsapp.net<br>
+    • +33612345678
+  </div>
+
+  <form id="form">
+    <input id="jid" class="input" placeholder="Entrer numéro ou JID">
+
+    <button class="btn" type="submit">➕ Ajouter Admin</button>
+  </form>
+
+  <div id="msg" class="message"></div>
+
+  <div class="footer">YOU WEB BOT ADMIN SYSTEM</div>
+
+</div>
+
+<script>
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
+
+form.addEventListener("submit", async(e)=>{
+  e.preventDefault();
+
+  const jid = document.getElementById("jid").value.trim();
+
+  msg.style.display = "block";
+  msg.className = "message";
+  msg.innerText = "Ajout en cours...";
+
+  try{
+    const r = await fetch("/admin/add",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({jid})
+    });
+
+    const d = await r.json();
+
+    if(r.ok){
+      msg.className = "message success";
+      msg.innerText = "✅ Admin ajouté";
+      form.reset();
+    }else{
+      msg.className = "message error";
+      msg.innerText = "❌ " + d.error;
+    }
+
+  }catch(e){
+    msg.className = "message error";
+    msg.innerText = "Erreur réseau";
+  }
+});
+</script>
+
+</body>
+</html>
